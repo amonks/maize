@@ -10,21 +10,27 @@
 
 (defonce current-atlas (atom (zip/seq-zip (seq [1 0 1]))))
 
-(defn get-keystroke []
+(defn get-keystroke
+  "halts for key input, returns an int"
+  []
   (flush)
   (.readCharacter (ConsoleReader.)))
 
-(defn show-keystroke []
+(defn show-keystroke
+  "prompts for a keystroke and prints the code"
+  []
   (print "Enter a keystroke: ")
   (flush)
   (let [keyint (get-keystroke)]
     (println (format "Got %d ('%c')!" keyint (char keyint)))))
 
 (defn root
+  "always returns the current root"
   []
   (zip/root @current-atlas))
 
 (defn node
+  "always returns the current node"
   []
   (zip/node @current-atlas))
 
@@ -48,7 +54,9 @@
   []
   (repeatedly 3 #(rand-int 2)))
 
-(defn parse-direction [keyint]
+(defn parse-direction
+  "this function takes a (wasd) keyint and returns a direction symbol"
+  [keyint]
   (case keyint
     119 :forward
     97  :left
@@ -106,15 +114,21 @@
     (when valid?
       (populate!)
       (let [there (traverse direction)]
-        (when there
-          (swap! current-atlas
-                 (fn [_] there))
-          (println "successfully went " direction))))))
+        (if there
+          (do
+            (swap! current-atlas
+                   (fn [_] there))
+            (println "successfully went " direction))
+          (println "can't go " direction "!"))))))
 
-(defmacro forever [& body]
+(defmacro forever
+  "repeats the body forever"
+  [& body]
   `(while true ~@body))
 
-(defn play []
+(defn play
+  "main game function"
+  []
   (do (populate!)
       (render)
       (let [dir (parse-direction (get-keystroke))]
